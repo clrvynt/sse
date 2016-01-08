@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<title>Dashboard</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<!-- Javascript to monitor and display -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+	
+	
+	<!--  Charts -->
+	<script type="text/javascript" src="/assets/charts/js/Chart.Core.js"></script>
+	<script type="text/javascript" src="/assets/charts/js/Chart.Line.js"></script>
+	<link rel="stylesheet" type="text/css" href="/assets/charts/css/charts.css" />
+
+</head>
+<body class="node-type-corporate-page">
+	<div class="container">
+		<div class="row">
+			<div class="twitter-stat">
+				<div class="stat-wrap is-4Columns">
+					<span class="stat"><span class="stat-value" id="total-users">900</span><span class="stat-title">Total users</span></span>
+					<span class="stat"><span class="stat-value" id="total-messages">150003</span><span class="stat-title">Total Messages</span></span>
+				</div>
+			</div>
+		</div>
+		<div class="spacer"></div>
+		<div class="spacer"></div>
+	</div>
+
+<script>
+
+		var statsStream = "/stream";
+		$(window).load(function() { // within load with a setTimeout to prevent the infinite spinner
+			setTimeout(function() {
+				if(statsStream == undefined) {
+						console.log("statsStream is undefined")
+				} else {
+					// start the EventSource which will open a streaming connection to the server
+					var source = new EventSource(statsStream);
+					
+					// add the listener that will process incoming events
+					source.addEventListener('message', function(e) {
+						console.log(e.data);
+						if (e.data == "user") {
+							var tot_users = parseInt($('#total-users').text()) + 1;
+							console.log(tot_users);
+							$('#total-users').text(tot_users);
+						}
+						else if (e.data == "message") {
+							var tot_users = parseInt($('#total-messages').text()) + 1;
+							$('#total-messages').text(tot_users);
+						}
+					}, false);
+	
+					source.addEventListener('error', function(e) {
+					  if (e.eventPhase == EventSource.CLOSED) {
+					    // Connection was closed.
+						  console.log("Connection was closed on error: " + e);
+					  } else {
+						  console.log("Error occurred while streaming: " + e);
+					  }
+					}, false);
+				}
+			},0);
+		});
+		
+	</script>
+</body>
+</html>
